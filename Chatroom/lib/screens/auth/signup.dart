@@ -1,46 +1,17 @@
+import 'package:Chatroom/services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUp extends StatefulWidget {
+  SignUp({Key key}) : super(key: key);
+
   @override
   _SignUpState createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
-  FirebaseAuth auth = FirebaseAuth.instance;
-
+  final AuthService _authService = AuthService();
   String email = "";
   String password = "";
-
-  void signUpAction() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void signInAction() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,13 +38,13 @@ class _SignUpState extends State<SignUp> {
             ),
             RaisedButton(
               onPressed: () async {
-                signUpAction();
+                _authService.signUp(email, password);
               },
               child: Text("Signup"),
             ),
             RaisedButton(
               onPressed: () async {
-                signInAction();
+                _authService.signIn(email, password);
               },
               child: Text("SignIN"),
             )
