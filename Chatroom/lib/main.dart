@@ -34,10 +34,7 @@ class MyApp extends StatelessWidget {
               child: MaterialApp(home: Wrapper()),
             );
           }
-
-          // Otherwise, show something whilst waiting for initialization to complete
-          return Text("Loading");
-          //   },
+          return MaterialApp(home: Scaffold(body: Text("Loading")));
         });
   }
 }
