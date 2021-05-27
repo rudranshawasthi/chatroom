@@ -1,15 +1,31 @@
+import 'package:Chatroom/screens/main/home/feed.dart';
+import 'package:Chatroom/screens/main/home/search.dart';
 import 'package:Chatroom/services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final AuthService _authService = AuthService();
+  int _currentIndex = 0;
+  final List<Widget> _children = [Feed(), Search()];
+
+  void onTapPressed(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
       ),
-      body: Text("home"),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/add');
@@ -26,12 +42,8 @@ class Home extends StatelessWidget {
             ListTile(
                 title: Text("profile"),
                 onTap: () {
-                  Navigator.pushNamed(context, '/profile');
-                }),
-            ListTile(
-                title: Text("edit"),
-                onTap: () {
-                  Navigator.pushNamed(context, '/edit');
+                  Navigator.pushNamed(context, '/profile',
+                      arguments: FirebaseAuth.instance.currentUser.uid);
                 }),
             ListTile(
                 title: Text("Log Out"),
@@ -41,6 +53,17 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTapPressed,
+        currentIndex: _currentIndex,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'search'),
+        ],
+      ),
+      body: _children[_currentIndex],
     );
   }
 }

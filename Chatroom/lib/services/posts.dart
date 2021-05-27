@@ -9,9 +9,9 @@ class PostService {
       print(doc.get('text'));
       return PostModel(
         id: doc.id,
-        text: doc.get('text') ?? '',
-        creator: doc.get('createrID') ?? '',
-        timestamp: doc.get('timestamp') ?? 0,
+        text: doc.data()['text'] ?? '',
+        creator: doc.data()['createrID'] ?? '',
+        timestamp: doc.data()['timestamp'] ?? 0,
       );
     }).toList();
   }

@@ -1,12 +1,61 @@
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:Chatroom/models/user.dart';
+import 'package:Chatroom/screens/main/home/search.dart';
 import 'package:Chatroom/services/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
   UtilsService _utilsService = UtilsService();
+
+  List<UserModel> _userListFromQuerySnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      print(doc.data());
+
+      print(doc.get('name'));
+      return UserModel(
+        id: doc.id,
+        name: doc.data()['name'] ?? '',
+        profileImageUrl: doc.data()['profileImageUrl'] ?? '',
+        bannerImageUrl: doc.data()['bannerImageUrl'] ?? '',
+        email: doc.data()['email'] ?? '',
+      );
+    }).toList();
+  }
+
+  UserModel _userFromFirebaseSnapshot(DocumentSnapshot snapshot) {
+    return snapshot != null
+        ? UserModel(
+            id: snapshot.id,
+            name: snapshot.data()['name'] ?? '',
+            profileImageUrl: snapshot.data()['profileImageUrl'] ?? '',
+            bannerImageUrl: snapshot.data()['bannerImageUrl'] ?? '',
+            email: snapshot.data()['email'] ?? '',
+          )
+        : null;
+  }
+
+  Stream<UserModel> getUserInfo(uid) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .snapshots()
+        .map(_userFromFirebaseSnapshot);
+  }
+
+  Stream<List<UserModel>> queryByName(search) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .orderBy("name")
+        .startAt([search])
+        .endAt([search + '\uf8ff'])
+        .limit(10)
+        .snapshots()
+        .map(_userListFromQuerySnapshot);
+  }
+
   Future<void> updateProfile(
       File _bannerImage, File _profileImage, String name) async {
     String bannerImageUrl = '';
